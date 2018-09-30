@@ -41,6 +41,10 @@
 
 #include <stdio.h>
 
+#ifdef __MSDOS__
+# include <pc.h>
+#endif
+
 /* System-specific feature definitions and include files. */
 #include "rldefs.h"
 #include "rlmbutil.h"
@@ -2056,9 +2060,18 @@ _rl_move_vert (to)
     }
   else
     {			/* delta < 0 */
+#ifdef __MSDOS__
+      int row, col;
+
+      fflush (rl_outstream); /* make sure the cursor pos is current! */
+      ScreenGetCursor (&row, &col);
+      ScreenSetCursor (row + delta, col);
+      i = -delta;    /* in case someone wants to use it after the loop */
+#else /* !__MSDOS__ */
       if (_rl_term_up && *_rl_term_up)
 	for (i = 0; i < -delta; i++)
 	  tputs (_rl_term_up, 1, _rl_output_character_function);
+#endif /* !__MSDOS__ */
     }
 
   _rl_last_v_pos = to;		/* Now TO is here */
@@ -2318,9 +2331,12 @@ void
 _rl_clear_to_eol (count)
      int count;
 {
+#ifndef __MSDOS__
   if (_rl_term_clreol)
     tputs (_rl_term_clreol, 1, _rl_output_character_function);
-  else if (count)
+  else
+#endif
+  if (count)
     space_to_eol (count);
 }
 
@@ -2341,10 +2357,15 @@ space_to_eol (count)
 void
 _rl_clear_screen ()
 {
+#if defined (__GO32__)
+  ScreenClear ();	/* FIXME: only works in text modes */
+  ScreenSetCursor (0, 0);  /* term_clrpag is "cl" which homes the cursor */
+#else
   if (_rl_term_clrpag)
     tputs (_rl_term_clrpag, 1, _rl_output_character_function);
   else
     rl_crlf ();
+#endif
 }
 
 /* Insert COUNT characters from STRING to the output stream at column COL. */
@@ -2353,7 +2374,7 @@ insert_some_chars (string, count, col)
      char *string;
      int count, col;
 {
-#if defined (__MSDOS__) || defined (__MINGW32__)
+#if defined (__MSDOS__) || (defined (__MINGW32__) && !defined (NCURSES_VERSION))
   _rl_output_some_chars (string, count);
 #else
   /* DEBUGGING */
@@ -2405,7 +2426,7 @@ delete_chars (count)
   if (count > _rl_screenwidth)	/* XXX */
     return;
 
-#if !defined (__MSDOS__) && !defined (__MINGW32__)
+#if !defined (__MSDOS__) && !(defined (__MINGW32__) && !defined (NCURSES_VERSION))
   if (_rl_term_DC && *_rl_term_DC)
     {
       char *buffer;

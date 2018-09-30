@@ -156,7 +156,8 @@ int _rl_complete_mark_symlink_dirs = 0;
 int _rl_print_completions_horizontally;
 
 /* Non-zero means that case is not significant in filename completion. */
-#if defined (__MSDOS__) && !defined (__DJGPP__)
+#if defined (__MSDOS__) && !defined (__DJGPP__)	\
+  || (defined (_WIN32) && !defined (__CYGWIN__))
 int _rl_completion_case_fold = 1;
 #else
 int _rl_completion_case_fold = 0;
@@ -481,12 +482,17 @@ get_y_or_n (for_pager)
 {
   int c;
 
+/* Disabled for GDB due to the gdb.base/readline-ask.exp regression.
+   [patch] testsuite: Test readline-6.2 "ask" regression
+   http://sourceware.org/ml/gdb-patches/2011-05/msg00002.html  */
+#if 0
   /* For now, disable pager in callback mode, until we later convert to state
      driven functions.  Have to wait until next major version to add new
      state definition, since it will change value of RL_STATE_DONE. */
 #if defined (READLINE_CALLBACKS)
   if (RL_ISSTATE (RL_STATE_CALLBACK))
     return 1;
+#endif
 #endif
 
   for (;;)
@@ -593,8 +599,21 @@ stat_char (filename)
 #endif
   else if (S_ISREG (finfo.st_mode))
     {
+#if defined (_WIN32) && !defined (__CYGWIN__)
+      /* Windows 'access' doesn't support X_OK and on latest Windows
+	 versions even invokes an invalid parameter exception.  */
+      char *ext = strrchr (filename, '.');
+
+      if (ext
+	  && (_rl_stricmp (ext, ".exe") == 0
+	      || _rl_stricmp (ext, ".cmd") == 0
+	      || _rl_stricmp (ext, ".bat") == 0
+	      || _rl_stricmp (ext, ".com") == 0))
+	character = '*';
+#else
       if (access (filename, X_OK) == 0)
 	character = '*';
+#endif
     }
   return (character);
 }
@@ -618,7 +637,7 @@ printable_part (pathname)
     return (pathname);
 
   temp = strrchr (pathname, '/');
-#if defined (__MSDOS__)
+#if defined (__MSDOS__) || defined (_WIN32)
   if (temp == 0 && ISALPHA ((unsigned char)pathname[0]) && pathname[1] == ':')
     temp = pathname + 1;
 #endif
@@ -2168,7 +2187,7 @@ rl_filename_completion_function (text, state)
 
       temp = strrchr (dirname, '/');
 
-#if defined (__MSDOS__)
+#if defined (__MSDOS__) || defined (_WIN32)
       /* special hack for //X/... */
       if (dirname[0] == '/' && dirname[1] == '/' && ISALPHA ((unsigned char)dirname[2]) && dirname[3] == '/')
         temp = strrchr (dirname + 3, '/');
@@ -2179,7 +2198,7 @@ rl_filename_completion_function (text, state)
 	  strcpy (filename, ++temp);
 	  *temp = '\0';
 	}
-#if defined (__MSDOS__)
+#if defined (__MSDOS__) || (defined (_WIN32) && !defined (__CYGWIN__))
       /* searches from current directory on the drive */
       else if (ISALPHA ((unsigned char)dirname[0]) && dirname[1] == ':')
         {

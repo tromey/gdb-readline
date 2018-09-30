@@ -30,7 +30,7 @@ RL_LIBRARY_NAME = readline
 datarootdir = @datarootdir@
 
 srcdir = @srcdir@
-VPATH = .:@top_srcdir@
+VPATH = @top_srcdir@
 topdir = @top_srcdir@
 BUILD_DIR = @BUILD_DIR@
 

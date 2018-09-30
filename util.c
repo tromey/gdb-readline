@@ -55,6 +55,7 @@
 
 #include "rlprivate.h"
 #include "xmalloc.h"
+#include "rlshell.h"
 
 /* **************************************************************** */
 /*								    */
@@ -389,7 +390,7 @@ _rl_strnicmp (string1, string2, count)
         break;
       s2++;
     }
-  while (--count != 0)
+  while (--count != 0);
 
   return (0);
 }
@@ -507,7 +508,17 @@ _rl_tropen ()
 
   if (_rl_tracefp)
     fclose (_rl_tracefp);
+#if defined (_WIN32) && !defined (__CYGWIN__)
+  /* Windows doesn't have /var/tmp, so open the trace file in the
+     user's temporary directory instead.  */
+  sprintf (fnbuf, "%s/rltrace.%ld",
+	   (sh_get_env_value ("TEMP")
+	    ? sh_get_env_value ("TEMP")
+	    : "."),
+	   getpid());
+#else
   sprintf (fnbuf, "/var/tmp/rltrace.%ld", getpid());
+#endif
   unlink(fnbuf);
   _rl_tracefp = fopen (fnbuf, "w+");
   return _rl_tracefp != 0;

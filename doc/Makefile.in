@@ -18,7 +18,7 @@
 
 topdir = @top_srcdir@
 srcdir = @srcdir@
-VPATH = .:@srcdir@
+VPATH = @srcdir@
 
 prefix = @prefix@
 

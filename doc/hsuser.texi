@@ -26,9 +26,10 @@ into another language, under the above conditions for modified versions.
 @node Using History Interactively
 @chapter Using History Interactively
 
-@ifclear BashFeatures
-@defcodeindex bt
-@end ifclear
+@c GDB bundling modification:
+@c @ifclear BashFeatures
+@c @defcodeindex bt
+@c @end ifclear
 
 @ifset BashFeatures
 This chapter describes how to use the @sc{gnu} History Library
@@ -41,7 +42,8 @@ see the @sc{gnu} Readline Library Manual.
 This chapter describes how to use the @sc{gnu} History Library interactively,
 from a user's standpoint.  It should be considered a user's guide.  For
 information on using the @sc{gnu} History Library in your own programs,
-@pxref{Programming with GNU History}.
+@c GDB bundling modification:
+@pxref{Programming with GNU History, , , history, GNU History Library}.
 @end ifclear
 
 @ifset BashFeatures
