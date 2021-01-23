@@ -1,3 +1,7 @@
+2021-01-23  Tom Tromey  <tom@tromey.com>
+
+	* input.c [_WIN32]: Use code from upstream readline.
+
 2017-05-19  Eli Zaretskii  <eliz@gnu.org>
 
 	* input.c [_WIN32]: Include <conio.h> to avoid compiler warning on
