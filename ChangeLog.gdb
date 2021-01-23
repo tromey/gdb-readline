@@ -2,6 +2,52 @@
 
 	* input.c [_WIN32]: Use code from upstream readline.
 
+2019-10-23  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	PR cli/24980
+	* display.c (init_line_structures): Initialise line_state using
+	original minsize value.
+
+2019-08-13  Christian Biesinger  <cbiesinger@google.com>
+
+	* colors.c (_rl_print_color_indicator): Remove unnecessary
+	S_ISLNK check to fix compilation on MinGW.
+
+2019-08-12  Tom Tromey  <tom@tromey.com>
+
+	* Imported readline 8.0.
+
+2019-08-12  Tom Tromey  <tom@tromey.com>
+
+	* Makefile.in (xfree.o): Don't depend on readline.h.
+	* xfree.c (xfree): Remove gdb workaround.
+	* xmalloc.h (xfree): Remove #define.
+
+2018-08-12  Tom Tromey  <tom@tromey.com>
+
+	* emacs_keymap.c: Remove gdb workaround.
+
+2018-08-12  Tom Tromey  <tom@tromey.com>
+
+	* complete.c (get_y_or_n): Remove gdb workaround.
+
+2018-08-12  Tom Tromey  <tom@tromey.com>
+
+	* Imported readline 7.0 patch 5.
+
+2019-07-12  Tom de Vries  <tdevries@suse.de>
+	    Chet Ramey  <chet.ramey@case.edu>
+
+	PR cli/24514
+	* readline/display.c (init_line_structures, rl_redisplay): Ensure
+	line_size is at	least _rl_screenwidth + 1.
+
+2019-01-31  Alan Hayward  <alan.hayward@arm.com>
+
+	* config.h.in: Add SOURCE/EXTENSION macros.
+	* histfile.c (history_truncate_file): Check return of write.
+	* util.c (_rl_tropen): Ensure pid is long.
+
 2017-05-19  Eli Zaretskii  <eliz@gnu.org>
 
 	* input.c [_WIN32]: Include <conio.h> to avoid compiler warning on
